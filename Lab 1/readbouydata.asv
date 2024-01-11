@@ -1,0 +1,35 @@
+% define a function to read data from dataset file - 
+% return the data encapsulated into a form that can be computed throughout the implementation
+% also return the the number of elements in the data structure
+function [data, count] = readbouydata()
+
+% assign a varaible to hold the location of the bouy dataset
+datafile = '045200603.txt';
+% open file for reading and get a reference to the file via fid
+fid = fopen(datafile, 'r');
+
+% skip the first two lines in the file
+fgetl(fid);
+fgetl(fid);
+
+% read data into matrix A from the fid file reference in the format string specifes how each line in the file should be
+% interpreted by assigining it a data type, %d stores value as an integer %f stores value as a float
+% the values 10 indicates the each line should be interpreated as a set of 10 values
+% inf indicates each line should be interpreted until the end of the file
+[A, count] = fscanf(fid, '%d %d %d %d %d %f %f %d %f %f', [10, inf]);
+
+% Process data and assign it to the bouy data structure
+% Access the relevant part of the A matrix created by fscanf and store it
+% with an appropriate name such as date, Hs, Tp, Dp, Ta, SST
+data.date = datetime([A(1:5, :); zeros(1, size(A, 2))])'; % Convert to datetime
+data.Hs = A(6, :);  % Store significant wave height
+data.Tp = A(7, :);  % Store peak period
+data.Dp = A(8, :);  % Store peak period direction
+data.Ta = A(9, :);  % Store average period
+data.SST = A(10, :); % Store sea surface temperature
+
+% delete the reference to the file
+fclose(fid);
+
+% end the function
+end

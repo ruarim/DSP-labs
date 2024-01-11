@@ -1,0 +1,32 @@
+M_vec = [5, 21, 51];
+data = bouy_data.Hs;
+causal(M_vec, data);
+function causal(M, data)
+bouy_data = readbouydata(); % read bouy data intro data structure
+dates = bouy_data.date; % extract the dates to scale the Y axis label
+y_label = 'Peak Period (s)'; % label Y axis
+tiledlayout(3,1); % create a plot layout to display the three plots
+for m = M % iterate each window size - 5, 21, 51
+movavg = causal_mov_avg(data, m); % calculate the moving average for each M
+plot_movavg(data, movavg, m, dates, y_label); % plot the moving average for each M
+end
+end
+function [out_data] = causal_mov_avg(x, m)
+data_length = length(x);
+in_data = [zeros(1, m-1), x]; % add the appropriate zero padding at the start for both input and output vectors
+out_data = zeros(1, data_length);
+out_data = movavg(m, in_data, out_data, data_length); % calculate and assign the moving average to the output vector
+end
+function plot_movavg(data, data_avg, m, date, y_label)
+date_min = min(date); % get the minimi
+date_max = max(date);
+nexttile;
+plot(date, data,'Color',[0.8 0.8 0.8],'LineWidth',2);
+hold on
+plot(date, data_avg, 'k');
+hold on
+title(strcat('M=', int2str(m)));
+ylabel(y_label);
+xlim([date_min, date_max]); % set x axis limits using date range variables
+datetick('x', 'mm/dd', 'keepticks', 'keeplimits');
+end
